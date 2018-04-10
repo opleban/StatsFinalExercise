@@ -19,7 +19,7 @@ Loading Data
 wdi.data <- read_dta("~/desktop/stats/final_exercise/wdi.dta")
 
 # LOAD WDI COUNTRIES
-wdi.countries <- read_excel("~/desktop/stats/final_exercise/Country.xlsx")
+wdi.countries <- read_excel("~/desktop/stats/final_exercise/FinalExercise/Country.xlsx")
 ```
 
 ```{r}
@@ -29,9 +29,9 @@ wdi.selected <- select(wdi.data, countryname, countrycode, year, sp_ado_tfrt, se
 # Rename Columns
 names(wdi.selected) <- c("Country_Name", "Country Code", "Year", "Adolescent_Fertility_Rate","Secondary_School_Enrollment", "Female_Secondary_School_Enrollment", "Male_Secondary_School_Enrollment", "GDP_Per_Capita", "GINI", "Percent_Female", "Compulsory_Education", "Contraceptive Prevalence", "Unmet Need for Contraception", "Population", "Maternal_Mortality_Rate", "Percent_Rural_Population", "Female_Child_Employment", "Female_Labor_Force_Participation", "Primary_School_Enrollment")
 
-wdi.did <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru") & (Year >= 1986 & Year <= 2002))
+wdi.did <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru") & (Year >= 1978 & Year <= 2014))
 
-wdi.more <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru" | Country_Name=="Panama" | Country_Name=="Guatemala" | Country_Name=="Honduras" | Country_Name=="Dominican Republic" | Country_Name=="Ecuador" | Country_Name=="Venezuela, RB" | Country_Name=="Colombia" | Country_Name=="Paraguay") & (Year >= 1986 & Year <= 2002))
+wdi.more <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru" | Country_Name=="Panama" | Country_Name=="Guatemala" | Country_Name=="Honduras" | Country_Name=="Dominican Republic" | Country_Name=="Ecuador" | Country_Name=="Venezuela, RB" | Country_Name=="Colombia" | Country_Name=="Paraguay") & (Year >= 1982 & Year <= 2010))
 
 ggplot(data=wdi.did)+ 
   geom_line(aes(`Year`, `Adolescent_Fertility_Rate`, group=`Country_Name`, colour=`Country_Name`),) +  
