@@ -31,30 +31,24 @@ names(wdi.selected) <- c("Country_Name", "Country Code", "Year", "Adolescent_Fer
 
 wdi.did <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru") & (Year >= 1978 & Year <= 2014))
 
-wdi.more <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru" | Country_Name=="Panama" | Country_Name=="Guatemala" | Country_Name=="Honduras" | Country_Name=="Dominican Republic" | Country_Name=="Ecuador" | Country_Name=="Venezuela, RB" | Country_Name=="Colombia" | Country_Name=="Paraguay") & (Year >= 1982 & Year <= 2010))
+wdi.more <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru" | Country_Name=="Panama" | Country_Name=="Guatemala" | Country_Name=="Honduras" | Country_Name=="Dominican Republic" | Country_Name=="Ecuador" | Country_Name=="Venezuela, RB" | Country_Name=="Colombia" | Country_Name=="Paraguay") & (Year >= 1978 & Year <= 2014))
 
 ggplot(data=wdi.did)+ 
   geom_line(aes(`Year`, `Adolescent_Fertility_Rate`, group=`Country_Name`, colour=`Country_Name`),) +  
   ggtitle("Plot of Adolescent Fertility Rate by Year, Costa Rica & Peru") +
-  geom_vline(xintercept = 1994) +
-  geom_vline(xintercept = 1986) +
-  geom_vline(xintercept = 2002)
+  geom_vline(xintercept = 1994)
 ```
 Primary School Enrollment Regressions
 ```{r}
 ggplot(data=wdi.did)+ 
   geom_line(aes(`Year`, `Primary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
   ggtitle("Plot of Primary School Enrollment by Year, Costa Rica & Peru") +
-  geom_vline(xintercept = 1994) +
-  geom_vline(xintercept = 1986) +
-  geom_vline(xintercept = 2002)
+  geom_vline(xintercept = 1994)
 
 ggplot(data=wdi.more)+ 
   geom_line(aes(`Year`, `Primary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
   ggtitle("Plot of Primary School Enrollment by Year, More") +
-  geom_vline(xintercept = 1994) +
-  geom_vline(xintercept = 1986) +
-  geom_vline(xintercept = 2002)
+  geom_vline(xintercept = 1994)
 ```
 Set up Diff-in-Diff Variables
 ```{r}
@@ -88,16 +82,11 @@ Secondary School Enrollment Charts
 ggplot(data=wdi.did)+ 
   geom_line(aes(`Year`, `Secondary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
   ggtitle("Plot of Secondary School Enrollment by Year, Costa Rica & Peru") +
-  geom_vline(xintercept = 1994) +
-  geom_vline(xintercept = 1986) +
-  geom_vline(xintercept = 2002)
-
+  geom_vline(xintercept = 1994)
 ggplot(data=wdi.more)+ 
   geom_line(aes(`Year`, `Secondary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
   ggtitle("Plot of Secondary School Enrollment by Year, More") +
-  geom_vline(xintercept = 1994) +
-  geom_vline(xintercept = 1986) +
-  geom_vline(xintercept = 2002)
+  geom_vline(xintercept = 1994)
 ```
 Secondary School Enrollment Regressions
 Regress Adolescent Fertility Rate on Secondary School Enrollment
