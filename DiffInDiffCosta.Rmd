@@ -1,0 +1,128 @@
+---
+title: "Alternative Final Exercise"
+output:
+  word_document: default
+  html_notebook: default
+---
+Loading Libraries
+```{r}
+rm(list=ls())
+library(haven)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(plm)
+```
+Loading Data
+```{r}
+# Load in WDI Data
+wdi.data <- read_dta("~/desktop/stats/final_exercise/wdi.dta")
+
+# LOAD WDI COUNTRIES
+wdi.countries <- read_excel("~/desktop/stats/final_exercise/Country.xlsx")
+```
+
+```{r}
+# Selected Attributes
+wdi.selected <- select(wdi.data, countryname, countrycode, year, sp_ado_tfrt, se_sec_enrr, se_sec_enrr_fe, se_sec_enrr_ma, ny_gdp_pcap_cd, si_pov_gini, sp_pop_totl_fe_zs, se_com_durs, sp_dyn_conu_zs, sp_uwt_tfrt, sp_pop_totl, sh_sta_mmrt_ne, sp_rur_totl_zs, sl_tlf_0714_fe_zs, sl_tlf_acti_1524_fe_ne_zs, se_prm_enrr)
+
+# Rename Columns
+names(wdi.selected) <- c("Country_Name", "Country Code", "Year", "Adolescent_Fertility_Rate","Secondary_School_Enrollment", "Female_Secondary_School_Enrollment", "Male_Secondary_School_Enrollment", "GDP_Per_Capita", "GINI", "Percent_Female", "Compulsory_Education", "Contraceptive Prevalence", "Unmet Need for Contraception", "Population", "Maternal_Mortality_Rate", "Percent_Rural_Population", "Female_Child_Employment", "Female_Labor_Force_Participation", "Primary_School_Enrollment")
+
+wdi.did <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru") & (Year >= 1986 & Year <= 2002))
+
+wdi.more <- filter(wdi.selected, (Country_Name =="Costa Rica" | Country_Name=="Peru" | Country_Name=="Panama" | Country_Name=="Guatemala" | Country_Name=="Honduras" | Country_Name=="Dominican Republic" | Country_Name=="Ecuador" | Country_Name=="Venezuela, RB" | Country_Name=="Colombia" | Country_Name=="Paraguay") & (Year >= 1986 & Year <= 2002))
+
+ggplot(data=wdi.did)+ 
+  geom_line(aes(`Year`, `Adolescent_Fertility_Rate`, group=`Country_Name`, colour=`Country_Name`),) +  
+  ggtitle("Plot of Adolescent Fertility Rate by Year, Costa Rica & Peru") +
+  geom_vline(xintercept = 1994) +
+  geom_vline(xintercept = 1986) +
+  geom_vline(xintercept = 2002)
+```
+Primary School Enrollment Regressions
+```{r}
+ggplot(data=wdi.did)+ 
+  geom_line(aes(`Year`, `Primary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
+  ggtitle("Plot of Primary School Enrollment by Year, Costa Rica & Peru") +
+  geom_vline(xintercept = 1994) +
+  geom_vline(xintercept = 1986) +
+  geom_vline(xintercept = 2002)
+
+ggplot(data=wdi.more)+ 
+  geom_line(aes(`Year`, `Primary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
+  ggtitle("Plot of Primary School Enrollment by Year, More") +
+  geom_vline(xintercept = 1994) +
+  geom_vline(xintercept = 1986) +
+  geom_vline(xintercept = 2002)
+```
+Set up Diff-in-Diff Variables
+```{r}
+# Set "intervention"" variable for all observations after 1994
+wdi.did$intervention <- ifelse(wdi.did$Year > 1994, 1, 0)
+# Set "treated" for all treated countries (i.e. Costa Rica)
+wdi.did$treated <- ifelse(wdi.did$Country_Name == "Costa Rica", 1, 0)
+# Set up the interaction variable "did" to be intervention * treated
+# In this case set 1 for observations of Costa Rica after 1994 when the intervention occured
+wdi.did$did <- wdi.did$intervention * wdi.did$treated
+```
+Primary School Regressions
+Regress Adolescent Fertility Rate on Primary School Enrollment
+```{r}
+# Regress Adolescent Fertility Rate on Primary School Enrollment
+primarySchoolEnrollReg <- lm(data=wdi.did, Adolescent_Fertility_Rate ~ Primary_School_Enrollment + GDP_Per_Capita)
+
+summary(primarySchoolEnrollReg)
+```
+Diff-in-Diff regression to show impact of intervention on Primary School Enrollment
+First Stage Regression (see bottom for second stage regresssion)
+```{r}
+# Diff-in-Diff regression to show impact of intervention on Primary School Enrollment
+# When you control for GDP_Per_Capita the significance disappears....
+primaryDidReg <- lm(Primary_School_Enrollment ~ treated + intervention + did, data = wdi.did)
+
+summary(primaryDidReg)
+```
+Secondary School Enrollment Charts
+```{r}
+ggplot(data=wdi.did)+ 
+  geom_line(aes(`Year`, `Secondary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
+  ggtitle("Plot of Secondary School Enrollment by Year, Costa Rica & Peru") +
+  geom_vline(xintercept = 1994) +
+  geom_vline(xintercept = 1986) +
+  geom_vline(xintercept = 2002)
+
+ggplot(data=wdi.more)+ 
+  geom_line(aes(`Year`, `Secondary_School_Enrollment`, group=`Country_Name`, colour=`Country_Name`),) +
+  ggtitle("Plot of Secondary School Enrollment by Year, More") +
+  geom_vline(xintercept = 1994) +
+  geom_vline(xintercept = 1986) +
+  geom_vline(xintercept = 2002)
+```
+Secondary School Enrollment Regressions
+Regress Adolescent Fertility Rate on Secondary School Enrollment
+```{r}
+secondarySchoolEnrollReg <- lm(data=wdi.did, Adolescent_Fertility_Rate ~ Secondary_School_Enrollment + GDP_Per_Capita)
+
+summary(secondarySchoolEnrollReg)
+
+```
+First State Regression
+Diff-in-Diff regression to show impact of intervention on the Secondary School Enrollment
+```{r}
+
+# Diff-in-Diff regression to show impact of intervention on Secondary School Enrollment
+# When you control for GDP_Per_Capita the significance disappears....
+secondaryDidReg <- lm(Secondary_School_Enrollment ~ treated + intervention + did, data = wdi.did)
+
+summary(secondaryDidReg)
+```
+Second State Regression
+Diff-in-Diff regression to show the impact of the intervention on the Adolescent Fertility Rate
+```{r}
+fertilityDidReg <- lm(Adolescent_Fertility_Rate ~ treated + intervention + did + GDP_Per_Capita, data = wdi.did)
+
+summary(fertilityDidReg)
+```
+
+
